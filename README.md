@@ -86,51 +86,51 @@ Details of each setting are as follows:
 
 ### 🏷️ Simulation
 
-* **N:** Number of particles (0–100)
-* **G:** Gravity strength (0.0–10.0)
+- **N:** Number of particles (0–100)
+- **G:** Gravity strength (0.0–10.0)
 
 ### 🏷️ Mass
 
-* **type:** How particle mass is determined
+- **type:** How particle mass is determined
 
-  * **fixed:** Fixed value
-  * **random:** Random value
-* **fixedValue:** Mass when `type` is `fixed`
-* **randomMinValue:** Minimum mass when `type` is `random`
-* **randomMaxValue:** Maximum mass when `type` is `random`
+  - **fixed:** Fixed value
+  - **random:** Random value
+- **fixedValue:** Mass when `type` is `fixed`
+- **randomMinValue:** Minimum mass when `type` is `random`
+- **randomMaxValue:** Maximum mass when `type` is `random`
 
 ### 🏷️ Radius
 
-* **type:** How particle radius is determined
+- **type:** How particle radius is determined
 
-  * **fixed:** Fixed value
-  * **random:** Random value
-  * **mass_based:** Based on mass
-* **fixedValue:** Radius when `type` is `fixed`
-* **randomMinValue:** Minimum radius when `type` is `random`
-* **randomMaxValue:** Maximum radius when `type` is `random`
+  - **fixed:** Fixed value
+  - **random:** Random value
+  - **mass_based:** Based on mass
+- **fixedValue:** Radius when `type` is `fixed`
+- **randomMinValue:** Minimum radius when `type` is `random`
+- **randomMaxValue:** Maximum radius when `type` is `random`
 
 ### 🏷️ Color
 
-* **type:** How particle color is determined
+- **type:** How particle color is determined
 
-  * **fixed:** Fixed color
-  * **random:** Random color
-  * **mass_based:** Based on mass
-  * **cycling:** Cycles through 10 preset colors
-* **fixedValue:** Color when `type` is `fixed` (`#ffffff` format)
-* **massBased0:** Start color for `mass_based`
-* **massBased1:** End color for `mass_based`
+  - **fixed:** Fixed color
+  - **random:** Random color
+  - **mass_based:** Based on mass
+  - **cycling:** Cycles through 10 preset colors
+- **fixedValue:** Color when `type` is `fixed` (`#ffffff` format)
+- **massBased0:** Start color for `mass_based`
+- **massBased1:** End color for `mass_based`
 
 ### 🏷️ Clock
 
-* **visible:** Toggle clock visibility
-* **fontSize:** Clock font size (px)
-* **fontFamily:** Clock font family
+- **visible:** Toggle clock visibility
+- **fontSize:** Clock font size (px)
+- **fontFamily:** Clock font family
 
 ### 🏷️ Window
 
-* **onTop:** Keep the window always on top
+- **onTop:** Keep the window always on top
 
 ## 💎 Controls
 
@@ -189,4 +189,4 @@ Please see the **LICENSE** file for details.
 
 ### 1.0.0 (2025/xx/xx)
 
-* Initial release
+- Initial release
