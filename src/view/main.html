@@ -1,0 +1,558 @@
+<!--
+GravityClock
+Copyright (c) 2025 led-mirage
+Licensed under the MIT License – see LICENSE file for details.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>GravityClock</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: black;
+        }
+
+        .setting-btn {
+            position: fixed;
+            top: 5px;
+            left: 5px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            color: #000;
+            text-align: center;
+            line-height: 20px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 1.0s;
+            pointer-events: none;
+        }
+
+        .setting-btn.active {
+            opacity: 0.9;
+            pointer-events: auto;
+        }
+
+        .setting-btn:hover {
+            background: rgba(80, 160, 255, 0.9);
+            color: #fff;
+        }
+
+        .close-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            color: #000;
+            font-weight: bold;
+            text-align: center;
+            line-height: 24px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 1.0s;
+            pointer-events: none;
+        }
+
+        .close-btn.active {
+            opacity: 0.9;
+            pointer-events: auto;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 80, 80, 0.9);
+            color: #fff;
+        }
+
+        .floating-text {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 12px;
+            background: transparent;
+            color: #fff;
+            text-shadow:
+                0 0 5px #00bfff,
+                0 0 10px #00bfff,
+                0 0 20px #00bfff,
+                0 0 40px #00bfff;
+            border-radius: 6px;
+            font-family: sans-serif;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+        }
+
+        .floating-text.show {
+            opacity: 1;
+        }        
+
+        /* 時計表示 */
+        #clock {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: "Segoe UI", sans-serif;
+            font-size: 48px;
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow:
+                0 0 5px #00bfff,
+                0 0 10px #00bfff,
+                0 0 20px #00bfff,
+                0 0 40px #00bfff;
+            user-select: none;
+            pointer-events: none;
+        }
+    </style>
+    <script src="js/color.js"></script>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="setting-btn">⚙️</div>
+    <div class="close-btn">×</div>
+    <div id="clock"></div>
+
+<script>
+let settings = null;
+let simulation = null;
+
+window.addEventListener('pywebviewready', async function() {
+    settings = await window.pywebview.api.get_settings();
+    console.log("Settings loaded:", settings);
+    initialize(settings);
+    startSimulation();
+});
+
+function updateSettings(newSettings) {
+    settings = newSettings;
+    setClockStyle(settings);
+    restartSimulation();
+}
+
+function onWindowMaximized() {
+    const canvas = document.getElementById("canvas");
+    canvas.style.cursor = "none";
+    restartSimulation();
+    displayWindowRestoreMessage();
+}
+
+function onWindowRestored() {
+    const canvas = document.getElementById("canvas");
+    canvas.style.cursor = "";
+}
+
+function displayWindowRestoreMessage() {
+    const msg = document.createElement("div");
+    msg.textContent = "Press ESC to restore";
+    msg.className = "floating-text";
+    document.body.appendChild(msg);
+
+    requestAnimationFrame(() => {
+        msg.classList.add("show");
+    });
+
+    setTimeout(() => {
+        msg.classList.remove('show');
+        setTimeout(() => msg.remove(), 600);
+    }, 5000);
+}
+</script>
+
+<script>
+// ==== 重力シミュレーション ====
+function startSimulation() {
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    const dt = 0.2;
+
+    let bodies = [];
+    let running = true;
+
+    initializeBodies();
+
+    function initializeBodies() {
+        bodies = [];
+        for (let i = 0; i < settings.simulation.N; i++) {
+            const param = getRandomBallParam(settings, i);
+            let b = {
+                x: param.x,
+                y: param.y,
+                vx: param.vx,
+                vy: param.vy,
+                m: param.m,
+                r: param.r,
+                color: param.color,
+            };
+            bodies.push(b);
+        }
+    }
+
+    function animate() {
+        if (!running) return;
+
+        // 軌跡を残すために半透明で塗りつぶす
+        ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+        ctx.fillRect(0, 0, width, height);
+
+        const forces = bodies.map(() => ({ fx: 0, fy: 0 }));
+
+        // 重力計算
+        for (let i = 0; i < bodies.length; i++) {
+            for (let j = i + 1; j < bodies.length; j++) {
+                const bi = bodies[i], bj = bodies[j];
+                const dx = bj.x - bi.x;
+                const dy = bj.y - bi.y;
+                const distSq = dx * dx + dy * dy;
+                const dist = Math.sqrt(distSq) + 0.1;
+                const F = (settings.simulation.G * bi.m * bj.m) / (distSq + 100);
+
+                const fx = (F * dx) / dist;
+                const fy = (F * dy) / dist;
+
+                forces[i].fx += fx;
+                forces[i].fy += fy;
+                forces[j].fx -= fx;
+                forces[j].fy -= fy;
+            }
+        }
+
+        // 位置・速度更新＋壁反射
+        for (let i = 0; i < bodies.length; i++) {
+            const b = bodies[i];
+            b.vx += (forces[i].fx / b.m) * dt;
+            b.vy += (forces[i].fy / b.m) * dt;
+            b.x += b.vx * dt;
+            b.y += b.vy * dt;
+
+            // 壁で反射
+            if (b.x < 0 || b.x > width - b.r) b.vx *= -0.98;
+            if (b.y < 0 || b.y > height - b.r) b.vy *= -0.98;
+
+            // 描画
+            ctx.beginPath();
+            ctx.fillStyle = b.color;
+            ctx.shadowColor = b.color;      // 光の色をボールと同じに
+            ctx.shadowBlur = 10;            // 発光の強さ（数値を上げるとふんわり光る）
+            ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 忘れずにシャドウをリセット（他の描画に影響しないように）
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = "transparent";
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    simulation = {
+        reset: () => {
+            ctx.clearRect(0, 0, width, height);
+            initializeBodies();
+        },
+        stop: () => {
+            running = false;
+        }
+    };
+
+    animate();
+
+    window.addEventListener("resize", () => {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        for (let b of bodies) {
+            if (b.x < 0 || b.x > width || b.y < 0 || b.y > height) {
+                b.x = Math.random() * (width - b.r * 2) + b.r;
+                b.y = Math.random() * (height - b.r * 2) + b.r;
+                b.vx = (Math.random() - 0.5) * 4;
+                b.vy = (Math.random() - 0.5) * 4;
+            }
+        }
+    });
+
+    function getRandomBallParam(settings, i) {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // 質量
+        let m = settings.mass.fixedValue;
+        if (settings.mass.type === "random") {
+            m = getRandomInt(settings.mass.randomMinValue, settings.mass.randomMaxValue);
+        }
+
+        // 半径
+        let r = settings.radius.fixedValue;
+        if (settings.radius.type === "random") {
+            r = getRandomInt(settings.radius.randomMinValue, settings.radius.randomMaxValue);
+        } else if (settings.radius.type === "mass_based") {
+            // 質量に基づいて半径を決定（例: 質量の平方根に比例）
+            r = Math.max(2, Math.min(20, Math.sqrt(m) / 5));
+        }
+
+        // 色
+        let color = settings.color.fixedValue;
+        if (settings.color.type === "random") {
+            color = getRandomColor();
+        } else if (settings.color.type === "mass_based") {
+            let massMin = 1, massMax = 1000;
+            if (settings.mass.type === "random") {
+                massMin = settings.mass.randomMinValue;
+                massMax = settings.mass.randomMaxValue
+            }
+            color = massToColor(m, massMin, massMax, settings.color.massBased0, settings.color.massBased1);
+        } else if (settings.color.type === "cycling") {
+            const cyclingColors = ["#e74c3c","#2ecc71","#3498ff","#e67e22","#f1c40f","#1abc9c","#9b59b6","#ff66b3","#3449ae","#95a5a6"];
+            color = cyclingColors[i % cyclingColors.length];
+        }
+
+        param = {
+            x: Math.random() * (width - r * 2) + r,
+            y: Math.random() * (height - r * 2) + r,
+            vx: (Math.random() - 0.5) * 4,
+            vy: (Math.random() - 0.5) * 4,
+            m: m,
+            r: r,
+            color: color,
+        };
+        return param;
+    }
+
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function getRandomColor() {
+        let r, g, b;
+        while (true) {
+            r = getRandomInt(0, 255);
+            g = getRandomInt(0, 255);
+            b = getRandomInt(0, 255);
+            if (r + g + b >= 255) break;
+        }
+        const rh = r.toString(16).padStart(2, "0");
+        const gh = g.toString(16).padStart(2, "0");
+        const bh = b.toString(16).padStart(2, "0");
+        const color = `#${rh}${gh}${bh}`;
+        return color;
+    }
+
+    // mass: 1～1000（範囲外はクランプ）
+    function massToColor(mass, massMin, massMax, colorStart = "#00ffff", colorEnd = "#ffff00") {
+        const MIN = massMin, MAX = massMax;
+        const m = Math.min(MAX, Math.max(MIN, mass));
+        const t = (m - MIN) / (MAX - MIN);   // 0..1
+
+        const hslStart = typeof colorStart === "string" ? hexToHsl(colorStart) : colorStart;
+        const hslEnd   = typeof colorEnd   === "string" ? hexToHsl(colorEnd)   : colorEnd;
+
+        // Hueの補間は円環対応
+        let dh = hslEnd.h - hslStart.h;
+        if (dh > 180) dh -= 360;
+        if (dh < -180) dh += 360;
+        const h = (hslStart.h + dh * t + 360) % 360;
+
+        // SとLをそれぞれ線形補間
+        const s = hslStart.s + (hslEnd.s - hslStart.s) * t;
+        const l = hslStart.l + (hslEnd.l - hslStart.l) * t;
+
+        return hslToHex(h, s, l);
+    }
+}
+
+function restartSimulation() {
+    simulation.stop();
+    startSimulation();    
+}
+</script>
+
+<script>
+// ==== リサイズ・ドラッグ・クローズ処理 ====
+function initialize(settings) {
+    let resizing = false;
+    let moving = false;
+    let startW, startH, startWindowPos, dx, dy;
+    let resizeDir = {};
+    let settingButtonHideTimeout = null;
+    let closeButtonHideTimeout = null;
+
+    const edgeSize = 10;
+    const settingBtn = document.querySelector('.setting-btn');
+    const closeBtn = document.querySelector('.close-btn');
+
+    window.addEventListener('mousedown', async e => {
+        startWindowPos = await getWindowPosition();
+        dx = dy = 0;
+
+        const onLeft   = e.clientX < edgeSize;
+        const onRight  = e.clientX > window.innerWidth - edgeSize;
+        const onTop    = e.clientY < edgeSize;
+        const onBottom = e.clientY > window.innerHeight - edgeSize;
+
+        // サイズ変更でドラッグできる辺は右と下のみ
+        // 左と上はウィンドウサイズの変更に伴ってスクリプトの座標系の計算がおかしくなる
+        if (onRight || onBottom) {
+            resizing = true;
+            startW = prevW = window.innerWidth;
+            startH = prevH = window.innerHeight;
+            resizeDir = { onLeft, onRight, onTop, onBottom };
+        }
+        else {
+            moving = true;
+        }
+    });
+
+    window.addEventListener('mousemove', async e => {
+        // カーソル変更処理
+        const onLeft   = e.clientX < edgeSize;
+        const onRight  = e.clientX > window.innerWidth - edgeSize;
+        const onTop    = e.clientY < edgeSize;
+        const onBottom = e.clientY > window.innerHeight - edgeSize;
+
+        let cursor = 'default';
+        if (onBottom && onRight) {
+            cursor = 'nwse-resize';  // ↘↖ のカーソル（左上↔右下）
+        } else if (onBottom) {
+            cursor = 'ns-resize';    // ↕ 縦方向
+        } else if (onRight) {
+            cursor = 'ew-resize';    // ↔ 横方向
+        }
+        document.body.style.cursor = cursor;
+
+        // リサイズ処理
+        if (resizing) {
+            let newW = startW;
+            let newH = startH;
+            dx += e.movementX;
+            dy += e.movementY;
+
+            if (resizeDir.onLeft) newW = startW - dx;
+            if (resizeDir.onRight) newW = startW + dx;
+            if (resizeDir.onTop) newH = startH - dy;
+            if (resizeDir.onBottom) newH = startH + dy;
+
+            try {
+                await window.pywebview.api.resize_window(newW, newH, resizeDir);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        else if (moving) {
+            dx += e.movementX;
+            dy += e.movementY;
+            const newX = startWindowPos.x + dx;
+            const newY = startWindowPos.y + dy;
+
+            try {
+                await window.pywebview.api.move_window(newX, newY);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // 左上にマウスが来たら × ボタン表示
+        const nearTopLeft = e.clientX < 40 && e.clientY < 40;
+        settingBtn.classList.toggle('active', nearTopLeft);
+        clearTimeout(settingButtonHideTimeout);
+        settingButtonHideTimeout = setTimeout(() => {
+            settingBtn.classList.remove('active');
+        }, 3000);
+
+        // 右上にマウスが来たら × ボタン表示
+        const nearTopRight = e.clientX > window.innerWidth - 40 && e.clientY < 40;
+        closeBtn.classList.toggle('active', nearTopRight);
+        clearTimeout(closeButtonHideTimeout);
+        closeButtonHideTimeout = setTimeout(() => {
+            closeBtn.classList.remove('active');
+        }, 3000);
+    });
+
+    window.addEventListener('mouseup', () => {
+        resizing = false;
+        moving = false;
+    });
+
+    settingBtn.addEventListener('click', async () => {
+        await window.pywebview.api.open_settings_window();
+    });
+
+    closeBtn.addEventListener('click', async () => {
+        await window.pywebview.api.close_app();
+    });
+
+    window.addEventListener('dblclick', async () => {
+        await window.pywebview.api.maximize_window();
+    });
+
+    document.addEventListener('keydown', async (event) => {
+        if (event.key.toLowerCase() === 'r') {
+            restartSimulation();
+        }
+
+        if (event.ctrlKey && event.key.toLowerCase() === 'm') {
+            await window.pywebview.api.minimize_window();
+        }
+
+        if (event.key === 'Escape') {
+            await window.pywebview.api.restore_window();
+        }
+    });
+
+    async function getWindowPosition() {
+        try {
+            return await window.pywebview.api.get_window_position();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    // ==== 時計 ====
+    const clock = document.getElementById('clock');
+
+    function updateClock() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        clock.textContent = `${h}:${m}:${s}`;
+    }
+
+    setClockStyle(settings);
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
+function setClockStyle(settings) {
+    const visible = settings.clock.visible;
+    const fontSize = settings.clock.fontSize;
+    const fontFamily = settings.clock.fontFamily;
+
+    const clock = document.getElementById('clock');
+    clock.style.display = visible ? 'block' : 'none';
+    clock.style.fontSize = `${fontSize}px`;
+    clock.style.fontFamily = `${fontFamily}`;
+}
+</script>
+</body>
+</html>

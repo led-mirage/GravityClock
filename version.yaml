@@ -1,0 +1,12 @@
+Version: 1.0.0.0
+CompanyName: led-mirage
+FileDescription: null
+InternalName: GravityClock
+LegalCopyright: © 2025 led-mirage
+OriginalFilename: GravityClock.exe
+ProductName: GravityClock
+Translation:
+- langID: 0
+  charsetID: 1200
+- langID: 1033
+  charsetID: 1200
