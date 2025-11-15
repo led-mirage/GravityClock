@@ -80,7 +80,7 @@ Glowing dots drift, gather, and shimmer like stars as time flows at the center.
 
 You can configure the app through the settings screen.
 
-<img src="documents/images/settings.png" width="200">
+<img src="documents/images/settings.png" width="300">
 
 Details of each setting are as follows:
 
