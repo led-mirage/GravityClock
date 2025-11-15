@@ -70,7 +70,7 @@ https://github.com/user-attachments/assets/336b66ff-12ca-4412-acc8-49a112bb9294
 
 設定は設定画面から行うことが可能です。
 
-<img src="documents/images/settings.png" width="200">
+<img src="documents/images/settings.png" width="300">
 
 設定項目の詳細は以下の通りです。
 
