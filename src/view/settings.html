@@ -1,0 +1,318 @@
+<!--
+GravityClock
+Copyright (c) 2025 led-mirage
+Licensed under the MIT License – see LICENSE file for details.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GravityClock - Settings</title>
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+    background-color: #111;
+    color: #eee;
+    font-family: "Segoe UI", sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+h1,
+h2 {
+    color: #c7d8e9;
+    text-shadow:
+        0 0 5px #00bfff,
+        0 0 10px #00bfff,
+        0 0 20px #00bfff,
+        0 0 40px #00bfff;
+}
+
+h1 {
+    margin: 10px 20px;
+}
+
+h2 {
+    margin-top: 0px;
+    margin-bottom: 8px;
+}
+
+.content-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px;
+}
+
+.footer {
+    position: sticky;
+    bottom: 0;
+    background: #111;
+    padding: 10px 20px;
+    text-align: right;
+    border-top: 1px solid #333;
+}
+
+section {
+    margin-top: 0px;
+    margin-bottom: 25px;           
+    padding: 0px 16px 16px 16px;
+    background: #1c1c1c;
+    border-radius: 8px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+label {
+    display: flex;
+    margin: 6px 0;
+    gap: 0.5em;
+    align-items: center;
+}
+
+input,
+select,
+button {
+    background: #222;
+    color: #eee;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 13px;
+}
+
+.hint {
+    color: silver;
+}
+
+#clock-fontFamily {
+    width: 50ch;
+}
+
+input[type="color"] {
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+button {
+    background: #0d1a24;
+    color: #c7d8e9;
+    border: 1px solid #00bfff;
+    font-weight: bold;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.25s ease;
+    text-shadow:
+        0 0 2px #bfeaff,
+        0 0 4px #00bfff;
+    box-shadow:
+        0 0 3px rgba(0, 191, 255, 0.5),
+        0 0 6px rgba(0, 191, 255, 0.3),
+        inset 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+button:hover {
+    background: #0f2230;
+    border-color: #bfeaff;
+    box-shadow:
+        0 0 10px rgba(191, 234, 255, 0.7),
+        0 0 20px rgba(191, 234, 255, 0.4);
+    text-shadow:
+        0 0 6px #ffffff,
+        0 0 12px #bfeaff;
+    transform: translateY(-1px);
+}
+
+button:active {
+    background: #08131c;
+    box-shadow:
+        0 0 6px rgba(0, 191, 255, 0.3),
+        inset 0 0 6px rgba(0, 0, 0, 0.6);
+    transform: translateY(0);
+}
+
+.copyright {
+    margin-top: 10px;
+    font-size: 11px;
+    text-align: center;
+    color: #c7d8e9;
+    text-shadow:
+        0 0 5px #00bfff,
+        0 0 10px #00bfff,
+        0 0 20px #00bfff,
+        0 0 40px #00bfff;
+}
+</style>
+</head>
+
+<body>
+<h1>Settings</h1>
+
+<div class="content-area">
+    <section>
+        <h2>Simulation</h2>
+        <label>N: <input type="number" id="sim-N" min="0" max="100" value="30" /><span class="hint">（0〜100）</span></label>
+        <label>G: <input type="number" id="sim-G" min="0" max="10" step="0.1" value="0.1" /><span class="hint">（0.0〜10.0）</span></label>
+    </section>
+
+    <section>
+        <h2>Mass</h2>
+        <label>Type:
+            <select id="mass-type">
+                <option value="fixed">Fixed</option>
+                <option value="random">Random</option>
+            </select>
+        </label>
+        <label>Fixed Value: <input type="number" id="mass-fixedValue" min="1" max="1000" value="100" /><span class="hint">（1〜1000）</span></label>
+        <label>Random MinValue: <input type="number" id="mass-randomMinValue" min="1" max="1000" value="1" /><span class="hint">（1〜1000）</span></label>
+        <label>Random MaxValue: <input type="number" id="mass-randomMaxValue" min="1" max="1000" value="500" /><span class="hint">（1〜1000）</span></label>
+    </section>
+
+    <section>
+        <h2>Radius</h2>
+        <label>Type:
+            <select id="radius-type">
+                <option value="fixed">Fixed</option>
+                <option value="random">Random</option>
+                <option value="mass_based">Mass Based</option>
+            </select>
+        </label>
+        <label>Fixed Value: <input type="number" id="radius-fixedValue" min="1" max="10" value="5" /><span class="hint">（1〜10）</span></label>
+        <label>Random MinValue: <input type="number" id="radius-randomMinValue" min="1" max="10" value="2" /><span class="hint">（1〜10）</span></label>
+        <label>Random MaxValue: <input type="number" id="radius-randomMaxValue" min="1" max="10" value="6" /><span class="hint">（1〜10）</span></label>
+    </section>
+
+    <section>
+        <h2>Color</h2>
+        <label>Type:
+            <select id="color-type">
+                <option value="fixed">Fixed</option>
+                <option value="random">Random</option>
+                <option value="mass_based">Mass Based</option>
+                <option value="cycling">Cycling</option>
+            </select>
+        </label>
+        <label>Fixed Color: <input type="color" id="color-fixedValue" value="#30dd80" /></label>
+        <label>Mass Based Color: <input type="color" id="color-massBased0" value="" /> → <input type="color" id="color-massBased1" value="" /></label>
+    </section>
+
+    <section>
+        <h2>Clock</h2>
+        <label><input type="checkbox" id="clock-visible" checked /> Visible</label>
+        <label>Font Size: <input type="number" id="clock-fontSize" min="1" max="1000" value="48" /><span class="hint">（1〜1000）</span></label>
+        <label>Font Family: <input type="text" id="clock-fontFamily" value="" /></label>
+    </section>
+
+    <section>
+        <h2>Window</h2>
+        <label><input type="checkbox" id="window-onTop" checked /> Always on Top</label>
+    </section>
+</div>
+
+<footer class="footer">
+    <button id="apply-button">Apply</button>
+    <button id="reset-button">Reset</button>
+    <button id="cancel-button">Cancel</button>
+    <div id="copyright" class="copyright"></div>
+</footer>
+
+<script>
+let settings = null;
+let default_settings = null;
+
+window.addEventListener('pywebviewready', async function() {
+    appInfo = await window.pywebview.api.get_app_info();
+    document.title = `${appInfo.name} - Settings`;
+    document.getElementById("copyright").innerText = `Unlimited Code Works / ${appInfo.name} ${appInfo.version} ${appInfo.copyright}`;
+
+    settings = await window.pywebview.api.get_settings();
+    default_settings = await window.pywebview.api.get_default_settings();
+    applySettings();
+});
+
+document.getElementById("apply-button").addEventListener("click", async () => {
+    const newSettings = generateJSON();
+    await window.pywebview.api.apply_settings(newSettings);
+});
+
+document.getElementById("reset-button").addEventListener("click", async () => {
+    settings = default_settings;
+    applySettings();
+});
+
+document.getElementById("cancel-button").addEventListener("click", () => {
+    window.pywebview.api.cancel_settings();
+});
+
+function applySettings() {
+    if (!settings) return;
+
+    document.getElementById("sim-N").value = settings.simulation.N;
+    document.getElementById("sim-G").value = settings.simulation.G;
+
+    document.getElementById("mass-type").value = settings.mass.type;
+    document.getElementById("mass-fixedValue").value = settings.mass.fixedValue;
+    document.getElementById("mass-randomMinValue").value = settings.mass.randomMinValue;
+    document.getElementById("mass-randomMaxValue").value = settings.mass.randomMaxValue;
+
+    document.getElementById("radius-type").value = settings.radius.type;
+    document.getElementById("radius-fixedValue").value = settings.radius.fixedValue;
+    document.getElementById("radius-randomMinValue").value = settings.radius.randomMinValue;
+    document.getElementById("radius-randomMaxValue").value = settings.radius.randomMaxValue;
+
+    document.getElementById("color-type").value = settings.color.type;
+    document.getElementById("color-fixedValue").value = settings.color.fixedValue;
+    document.getElementById("color-massBased0").value = settings.color.massBased0;
+    document.getElementById("color-massBased1").value = settings.color.massBased1;
+
+    document.getElementById("clock-visible").checked = settings.clock.visible;
+    document.getElementById("clock-fontSize").value = settings.clock.fontSize;
+    document.getElementById("clock-fontFamily").value = settings.clock.fontFamily;
+
+    document.getElementById("window-onTop").checked = settings.window.onTop;
+}
+
+function generateJSON() {
+    const json = {
+        simulation: {
+            N: parseInt(document.getElementById("sim-N").value),
+            G: parseFloat(document.getElementById("sim-G").value)
+        },
+        mass: {
+            type: document.getElementById("mass-type").value,
+            fixedValue: parseFloat(document.getElementById("mass-fixedValue").value),
+            randomMinValue: parseFloat(document.getElementById("mass-randomMinValue").value),
+            randomMaxValue: parseFloat(document.getElementById("mass-randomMaxValue").value)
+        },
+        radius: {
+            type: document.getElementById("radius-type").value,
+            fixedValue: parseFloat(document.getElementById("radius-fixedValue").value),
+            randomMinValue: parseFloat(document.getElementById("radius-randomMinValue").value),
+            randomMaxValue: parseFloat(document.getElementById("radius-randomMaxValue").value)
+        },
+        color: {
+            type: document.getElementById("color-type").value,
+            fixedValue: document.getElementById("color-fixedValue").value,
+            massBased0: document.getElementById("color-massBased0").value,
+            massBased1: document.getElementById("color-massBased1").value
+        },
+        clock: {
+            visible: document.getElementById("clock-visible").checked,
+            fontSize: parseInt(document.getElementById("clock-fontSize").value),
+            fontFamily: document.getElementById("clock-fontFamily").value
+        },
+        window: {
+            onTop: document.getElementById("window-onTop").checked
+        }
+    };
+
+    return json;
+}
+</script>
+</body>
+
+</html>

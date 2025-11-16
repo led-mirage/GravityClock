@@ -1,0 +1,2 @@
+pywebview==6.1.0
+pyinstaller_versionfile==3.0.1
