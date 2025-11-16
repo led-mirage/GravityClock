@@ -187,6 +187,6 @@ Please see the **LICENSE** file for details.
 
 ## 💎 Version History
 
-### 1.0.0 (2025/xx/xx)
+### 1.0.0 (2025/11/16)
 
 - Initial release
