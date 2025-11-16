@@ -145,8 +145,8 @@ https://github.com/user-attachments/assets/336b66ff-12ca-4412-acc8-49a112bb9294
 誤検知の問題は継続的に改善を試みていますが、現時点では完全な解決に至っていません。
 ご不便をおかけしますが、ご了承ください。
 
-VirusTotalでのスキャン結果は こちら から確認できます。
-（2025/xx/xx 時点、4/72 検出）
+VirusTotalでのスキャン結果は [こちら](https://www.virustotal.com/gui/file/11b158358f515b2d8474cd0c6a4cdca0d5bc6f80f59e289b1a59f122b1f9e622?nocache=1) から確認できます。  
+（2025/11/16 時点、3/72 検出）
 
 ## 💎 使用しているライブラリ
 

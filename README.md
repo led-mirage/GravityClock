@@ -158,8 +158,8 @@ but if you're concerned, you can run it using the “Run with Python” steps ab
 We continue to work on reducing false positives, but the issue is not fully resolved yet.  
 Thank you for your understanding.
 
-You can check the VirusTotal scan results here.  
-(As of 2025/xx/xx: 4/72 detections)
+You can check the VirusTotal scan results [here](https://www.virustotal.com/gui/file/11b158358f515b2d8474cd0c6a4cdca0d5bc6f80f59e289b1a59f122b1f9e622?nocache=1).  
+(As of 2025/11/16: 3/72 detections)
 
 ## 💎 Libraries Used
 
