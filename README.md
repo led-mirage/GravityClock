@@ -6,7 +6,7 @@ Glowing dots drift, gather, and shimmer like stars as time flows at the center.
 
 ## 💎 Screenshot
 
-[https://github.com/user-attachments/assets/336b66ff-12ca-4412-acc8-49a112bb9294](https://github.com/user-attachments/assets/336b66ff-12ca-4412-acc8-49a112bb9294)
+https://github.com/user-attachments/assets/c9922578-86ae-40c6-abe9-26b98560236a
 
 ## 💎 Features
 
